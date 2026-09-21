@@ -1,7 +1,7 @@
 {
   "name": "manifold-block-probe",
-  "version": "0.1.0",
-  "description": "Probe: does a synchronous block actually fire on this surface? Denies one tool call and one prompt, both matched on a single marker in a specific field. Logs the raw payload shape so a failure is diagnosable.",
+  "version": "0.2.0",
+  "description": "Probe: does a synchronous block fire on this surface? Denies one tool call and one prompt. v0.2.0 emits hookSpecificOutput for BOTH events; v0.1.0 used the older {\"decision\":\"block\"} for the prompt and hung the session.",
   "author": {
     "name": "Manifold Security"
   }

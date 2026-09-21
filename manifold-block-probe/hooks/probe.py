@@ -35,13 +35,14 @@ with open(LOG, "a") as fh:
 if not hit:
     sys.exit(0)
 
-if event == "UserPromptSubmit":
-    out = {"decision": "block", "reason": "manifold-block-probe: marker in prompt"}
-else:
-    out = {"hookSpecificOutput": {
-        "hookEventName": "PreToolUse",
-        "permissionDecision": "deny",
-        "permissionDecisionReason": "manifold-block-probe: marker in tool_input"}}
+# v0.1.0 emitted {"decision": "block"} here, the shape the August POC used, and the
+# session hung for minutes and could not be stopped. PreToolUse with hookSpecificOutput
+# denied cleanly in the same run, so this now uses the same shape for both events.
+out = {"hookSpecificOutput": {
+    "hookEventName": event,
+    "permissionDecision": "deny",
+    "permissionDecisionReason": "manifold-block-probe: marker in {}".format(
+        "prompt" if event == "UserPromptSubmit" else "tool_input")}}
 
 with open(LOG, "a") as fh:
     fh.write("   emitted={}\n".format(json.dumps(out)))
