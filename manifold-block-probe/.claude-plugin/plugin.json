@@ -1,0 +1,8 @@
+{
+  "name": "manifold-block-probe",
+  "version": "0.1.0",
+  "description": "Probe: does a synchronous block actually fire on this surface? Denies one tool call and one prompt, both matched on a single marker in a specific field. Logs the raw payload shape so a failure is diagnosable.",
+  "author": {
+    "name": "Manifold Security"
+  }
+}

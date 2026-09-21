@@ -1,0 +1,28 @@
+{
+  "description": "Blocking probe. Matches ONLY the prompt field and the tool_input field, never the whole payload.",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/probe.py\" UserPromptSubmit",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/probe.py\" PreToolUse",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

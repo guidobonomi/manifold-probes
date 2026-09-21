@@ -1,0 +1,13 @@
+{
+  "name": "manifold-probes",
+  "owner": {
+    "name": "Manifold Security"
+  },
+  "plugins": [
+    {
+      "name": "manifold-block-probe",
+      "source": "./manifold-block-probe",
+      "description": "Blocking probe for PRD-124 surface testing"
+    }
+  ]
+}
