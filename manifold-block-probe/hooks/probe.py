@@ -1,10 +1,18 @@
 #!/usr/bin/env python3
-"""Blocking probe. Reads the hook payload on stdin, records its shape, and denies
-only when the marker appears in the one field that event carries."""
+"""Blocking probe. Records the payload shape, then denies using one of two output
+shapes depending on which marker matched, so a single session shows which one works.
+
+  marker A -> {"decision": "block"}                  the shape the August POC used
+  marker B -> hookSpecificOutput/permissionDecision  confirmed working for PreToolUse,
+                                                     observed to be ignored on prompts
+
+PreToolUse denies on either marker and is the control: it is already known to work.
+"""
 import json, os, sys, datetime
 
 LOG = "/tmp/manifold-block-probe.log"
-MARKER = "MFDENY" + "-7Q2"          # split so this file never contains it whole
+A = "MFDENY" + "-7Q2"      # split so this file never contains either marker whole
+B = "MFDENY" + "-8R3"
 
 event = sys.argv[1] if len(sys.argv) > 1 else "unknown"
 raw = sys.stdin.read()
@@ -13,38 +21,37 @@ try:
 except Exception:
     payload = {}
 
-# Match the specific field only. Whole-payload matching broke co-work in the POC,
-# because cwd and transcript_path travel in the same object.
 if event == "UserPromptSubmit":
-    field = "prompt" if "prompt" in payload else ("user_prompt" if "user_prompt" in payload else None)
-    hay = str(payload.get(field, "")) if field else ""
+    field = "prompt" if "prompt" in payload else ("user_prompt" if "user_prompt" in payload else "MISSING")
+    hay = str(payload.get(field, ""))
 else:
     field = "tool_input"
     hay = json.dumps(payload.get("tool_input", ""))
 
-hit = MARKER in hay
+which = "A" if A in hay else ("B" if B in hay else None)
 
-with open(LOG, "a") as fh:
-    fh.write("{} event={} remote={} keys={} field={} hit={} tool={}\n".format(
-        datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        event,
-        os.environ.get("CLAUDE_CODE_REMOTE", "false"),
-        ",".join(sorted(payload.keys())) or "NONE",
-        field, hit, payload.get("tool_name", "-")))
+def log(line):
+    with open(LOG, "a") as fh:
+        fh.write(line + "\n")
 
-if not hit:
+log("{} event={} remote={} keys={} field={} marker={} tool={}".format(
+    datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+    event,
+    os.environ.get("CLAUDE_CODE_REMOTE", "false"),
+    ",".join(sorted(payload.keys())) or "NONE",
+    field, which or "none", payload.get("tool_name", "-")))
+
+if which is None:
     sys.exit(0)
 
-# v0.1.0 emitted {"decision": "block"} here, the shape the August POC used, and the
-# session hung for minutes and could not be stopped. PreToolUse with hookSpecificOutput
-# denied cleanly in the same run, so this now uses the same shape for both events.
-out = {"hookSpecificOutput": {
+legacy = {"decision": "block", "reason": "manifold-block-probe: marker A in prompt"}
+current = {"hookSpecificOutput": {
     "hookEventName": event,
     "permissionDecision": "deny",
-    "permissionDecisionReason": "manifold-block-probe: marker in {}".format(
-        "prompt" if event == "UserPromptSubmit" else "tool_input")}}
+    "permissionDecisionReason": "manifold-block-probe: marker {} in {}".format(which, field)}}
 
-with open(LOG, "a") as fh:
-    fh.write("   emitted={}\n".format(json.dumps(out)))
+out = legacy if (event == "UserPromptSubmit" and which == "A") else current
+
+log("   shape={} emitted={}".format("legacy" if out is legacy else "current", json.dumps(out)))
 print(json.dumps(out))
 sys.exit(0)
