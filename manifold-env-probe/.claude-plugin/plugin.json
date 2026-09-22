@@ -1,21 +1,21 @@
 {
   "name": "manifold-env-probe",
-  "version": "0.1.0",
-  "description": "Probe: does a pluginConfigs value set in managed settings actually reach the hook process as CLAUDE_PLUGIN_OPTION_<KEY>? Logs only. Blocks nothing, sends nothing.",
+  "version": "0.2.0",
+  "description": "Probe: what happens when configuration keys are renamed while an older plugin is still installed? v0.2.0 reads the renamed keys and logs both name sets plus its own version. Logs only.",
   "author": {
     "name": "Manifold Security"
   },
   "userConfig": {
-    "tenant_id": {
+    "tenant_ref": {
       "type": "string",
-      "title": "Tenant id",
-      "description": "Non-sensitive. Logged in full to prove delivery.",
+      "title": "Tenant ref",
+      "description": "Renamed from tenant_id in v0.2.0. Logged in full.",
       "sensitive": false
     },
-    "enrolment_key": {
+    "install_key": {
       "type": "string",
-      "title": "Enrolment key",
-      "description": "Sensitive. Only its length is logged, never the value.",
+      "title": "Install key",
+      "description": "Renamed from enrolment_key in v0.2.0. Only its length is logged.",
       "sensitive": true
     }
   }
