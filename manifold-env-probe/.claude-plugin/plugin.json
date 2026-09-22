@@ -1,0 +1,22 @@
+{
+  "name": "manifold-env-probe",
+  "version": "0.1.0",
+  "description": "Probe: does a pluginConfigs value set in managed settings actually reach the hook process as CLAUDE_PLUGIN_OPTION_<KEY>? Logs only. Blocks nothing, sends nothing.",
+  "author": {
+    "name": "Manifold Security"
+  },
+  "userConfig": {
+    "tenant_id": {
+      "type": "string",
+      "title": "Tenant id",
+      "description": "Non-sensitive. Logged in full to prove delivery.",
+      "sensitive": false
+    },
+    "enrolment_key": {
+      "type": "string",
+      "title": "Enrolment key",
+      "description": "Sensitive. Only its length is logged, never the value.",
+      "sensitive": true
+    }
+  }
+}

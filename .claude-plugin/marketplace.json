@@ -8,6 +8,11 @@
       "name": "manifold-block-probe",
       "source": "./manifold-block-probe",
       "description": "Blocking probe for PRD-124 surface testing"
+    },
+    {
+      "name": "manifold-env-probe",
+      "source": "./manifold-env-probe",
+      "description": "Checks whether managed-settings pluginConfigs reach the hook process"
     }
   ]
 }

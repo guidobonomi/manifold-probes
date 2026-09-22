@@ -1,0 +1,27 @@
+{
+  "description": "Log-only. One line per event recording whether the plugin's userConfig values reached the hook process, and which surface it ran on.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"$(date -u +%Y-%m-%dT%H:%M:%SZ) event=SessionStart entrypoint=${CLAUDE_CODE_ENTRYPOINT:-none} remote=${CLAUDE_CODE_REMOTE:-false} tenant=${CLAUDE_PLUGIN_OPTION_TENANT_ID:-UNSET} key_set=$([ -n \"${CLAUDE_PLUGIN_OPTION_ENROLMENT_KEY:-}\" ] && echo yes || echo no) key_len=${#CLAUDE_PLUGIN_OPTION_ENROLMENT_KEY}\" >> /tmp/manifold-env-probe.log",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"$(date -u +%Y-%m-%dT%H:%M:%SZ) event=UserPromptSubmit entrypoint=${CLAUDE_CODE_ENTRYPOINT:-none} remote=${CLAUDE_CODE_REMOTE:-false} tenant=${CLAUDE_PLUGIN_OPTION_TENANT_ID:-UNSET} key_set=$([ -n \"${CLAUDE_PLUGIN_OPTION_ENROLMENT_KEY:-}\" ] && echo yes || echo no) key_len=${#CLAUDE_PLUGIN_OPTION_ENROLMENT_KEY}\" >> /tmp/manifold-env-probe.log",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
